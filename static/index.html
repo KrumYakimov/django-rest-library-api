@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books API</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
+</head>
+<body>
+    <h1>Books API</h1>
+
+    <!-- Section: List All Books -->
+    <section aria-labelledby="list-books">
+        <h2 id="list-books">List All Books</h2>
+        <button onclick="getAllBooks()" aria-label="Fetch all books">Fetch All Books</button>
+        <ul id="booksList"></ul>
+    </section>
+
+    <!-- Section: Create a New Book -->
+    <section aria-labelledby="create-book">
+        <h2 id="create-book">Create a New Book</h2>
+        <form id="createBookForm" onsubmit="createBook(event)">
+            <fieldset>
+                <legend>Enter book details:</legend>
+
+                <label for="title">Title:</label>
+                <input type="text" id="title" required aria-required="true">
+
+                <label for="pages">Pages:</label>
+                <input type="number" id="pages" required aria-required="true" min="1">
+
+                <label for="description">Description:</label>
+                <textarea id="description" rows="3" placeholder="Enter book description"></textarea>
+
+                <label for="author">Author:</label>
+                <input type="text" id="author" required aria-required="true">
+
+                <label for="genre">Genre:</label>
+                <select id="genre" required aria-required="true">
+                    <option value="" disabled selected>Select Genre</option>
+                    <option value="FI">Fiction</option>
+                    <option value="NF">Non-Fiction</option>
+                    <option value="MY">Mystery</option>
+                    <option value="SF">Science Fiction</option>
+                    <option value="FA">Fantasy</option>
+                    <option value="RO">Romance</option>
+                    <option value="HO">Horror</option>
+                    <option value="BI">Biography</option>
+                    <option value="HI">History</option>
+                    <option value="PO">Poetry</option>
+                </select>
+
+                <label for="published_date">Published Date:</label>
+                <input type="date" id="published_date" required aria-required="true">
+
+                <button type="submit" aria-label="Create book">Create Book</button>
+            </fieldset>
+        </form>
+    </section>
+
+    <!-- Section: Manage Books by ID -->
+    <section aria-labelledby="manage-books">
+        <h2 id="manage-books">Get, Update, or Delete a Book by ID</h2>
+        <fieldset>
+            <legend>Manage a specific book:</legend>
+
+            <label for="bookId">Book ID:</label>
+            <input type="number" id="bookId" placeholder="Enter Book ID" required min="1">
+
+            <button onclick="getBook()" aria-label="Get book details">Get Book</button>
+            <button onclick="updateBook()" aria-label="Update book details">Update Book</button>
+            <button onclick="deleteBook()" aria-label="Delete book">Delete Book</button>
+        </fieldset>
+
+        <div id="bookDetails" aria-live="polite"></div>
+    </section>
+
+    <!-- Error Messages Section -->
+    <section id="errorMessages" aria-live="assertive"></section>
+
+    <script src="app.js"></script>
+</body>
+</html>
