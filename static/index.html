@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Books API</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Books API</h1>
@@ -24,19 +24,19 @@
                 <legend>Enter book details:</legend>
 
                 <label for="title">Title:</label>
-                <input type="text" id="title" required aria-required="true">
+                <input type="text" id="title" required>
 
                 <label for="pages">Pages:</label>
-                <input type="number" id="pages" required aria-required="true" min="1">
+                <input type="number" id="pages" required min="1">
 
                 <label for="description">Description:</label>
-                <textarea id="description" rows="3" placeholder="Enter book description"></textarea>
+                <textarea id="description" rows="3"></textarea>
 
                 <label for="author">Author:</label>
-                <input type="text" id="author" required aria-required="true">
+                <input type="text" id="author" required>
 
                 <label for="genre">Genre:</label>
-                <select id="genre" required aria-required="true">
+                <select id="genre" required>
                     <option value="" disabled selected>Select Genre</option>
                     <option value="FI">Fiction</option>
                     <option value="NF">Non-Fiction</option>
@@ -51,9 +51,54 @@
                 </select>
 
                 <label for="published_date">Published Date:</label>
-                <input type="date" id="published_date" required aria-required="true">
+                <input type="date" id="published_date" required>
 
-                <button type="submit" aria-label="Create book">Create Book</button>
+                <button type="submit">Create Book</button>
+            </fieldset>
+        </form>
+    </section>
+
+    <!-- Section: Edit a Book -->
+    <section aria-labelledby="edit-book">
+        <h2 id="edit-book">Edit a Book</h2>
+        <form id="editBookForm" onsubmit="editBook(event)">
+            <fieldset>
+                <legend>Edit book details:</legend>
+
+                <label for="editBookId">Book ID:</label>
+                <input type="number" id="editBookId" required min="1" placeholder="Enter Book ID to edit">
+
+                <label for="editTitle">Title:</label>
+                <input type="text" id="editTitle">
+
+                <label for="editPages">Pages:</label>
+                <input type="number" id="editPages" min="1">
+
+                <label for="editDescription">Description:</label>
+                <textarea id="editDescription" rows="3"></textarea>
+
+                <label for="editAuthor">Author:</label>
+                <input type="text" id="editAuthor">
+
+                <label for="editGenre">Genre:</label>
+                <select id="editGenre">
+                    <option value="" disabled selected>Select Genre</option>
+                    <option value="FI">Fiction</option>
+                    <option value="NF">Non-Fiction</option>
+                    <option value="MY">Mystery</option>
+                    <option value="SF">Science Fiction</option>
+                    <option value="FA">Fantasy</option>
+                    <option value="RO">Romance</option>
+                    <option value="HO">Horror</option>
+                    <option value="BI">Biography</option>
+                    <option value="HI">History</option>
+                    <option value="PO">Poetry</option>
+                </select>
+
+                <label for="editPublishedDate">Published Date:</label>
+                <input type="date" id="editPublishedDate">
+
+                <button type="submit">Update Book</button>
             </fieldset>
         </form>
     </section>
@@ -65,18 +110,14 @@
             <legend>Manage a specific book:</legend>
 
             <label for="bookId">Book ID:</label>
-            <input type="number" id="bookId" placeholder="Enter Book ID" required min="1">
+            <input type="number" id="bookId" required min="1">
 
-            <button onclick="getBook()" aria-label="Get book details">Get Book</button>
-            <button onclick="updateBook()" aria-label="Update book details">Update Book</button>
-            <button onclick="deleteBook()" aria-label="Delete book">Delete Book</button>
+            <button onclick="getBook()">Get Book</button>
+            <button onclick="deleteBook()">Delete Book</button>
         </fieldset>
 
-        <div id="bookDetails" aria-live="polite"></div>
+        <div id="bookDetails"></div>
     </section>
-
-    <!-- Error Messages Section -->
-    <section id="errorMessages" aria-live="assertive"></section>
 
     <script src="app.js"></script>
 </body>

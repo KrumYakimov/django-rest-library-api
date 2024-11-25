@@ -20,28 +20,50 @@ async function getAllBooks() {
 // Create a new book
 async function createBook(event) {
     event.preventDefault();
-    const title = document.getElementById('title').value;
-    const pages = document.getElementById('pages').value;
-    const description = document.getElementById('description').value;
-    const author = document.getElementById('author').value;
-    const genre = document.getElementById('genre').value;
-    const published_date = document.getElementById('published_date').value;
+
+    const title = document.getElementById("title").value.trim();
+    const pages = document.getElementById("pages").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const authorInput = document.getElementById("author").value.trim();
+    const genre = document.getElementById("genre").value;
+    const published_date = document.getElementById("published_date").value;
+
+    // Split the comma-separated author input into an array of objects
+    const authors = authorInput
+        .split(",")
+        .map((name) => ({ name: name.trim() }))
+        .filter((author) => author.name !== "");
+
+    const bookData = {
+        title,
+        pages: parseInt(pages),
+        description,
+        author: authors,
+        genre,
+        published_date,
+    };
 
     try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
+        const response = await fetch("/api/books/", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({ title, pages, description, author, genre, published_date })
+            body: JSON.stringify(bookData),
         });
-        const newBook = await response.json();
-        alert('Book created: ' + JSON.stringify(newBook));
-        getAllBooks();
+
+        if (response.ok) {
+            const createdBook = await response.json();
+            alert("Book created: " + JSON.stringify(createdBook));
+        } else {
+            const errorData = await response.json();
+            alert("Error creating book: " + JSON.stringify(errorData));
+        }
     } catch (error) {
-        console.error('Error creating book:', error);
+        console.error("Error creating book:", error);
     }
 }
+
 
 // Fetch a single book by ID
 async function getBook() {
@@ -87,40 +109,64 @@ async function getBook() {
 }
 
 
-// Update a book by ID
-async function updateBook() {
-    const bookId = document.getElementById('bookId').value;
+async function editBook(event) {
+    event.preventDefault();
+
+    const bookId = document.getElementById("editBookId").value.trim();
     if (!bookId) {
-        alert('Please enter a Book ID.');
+        alert("Please enter a valid Book ID.");
         return;
     }
 
-    const title = prompt('Enter new title:');
-    const pages = prompt('Enter new number of pages:');
-    const description = prompt('Enter new description:');
-    const author = prompt('Enter new author:');
-    const genre = prompt('Enter new genre:');
-    const published_date = prompt('Enter new published date (YYYY-MM-DD):');
+    const title = document.getElementById("editTitle").value.trim();
+    const pages = document.getElementById("editPages").value.trim();
+    const description = document.getElementById("editDescription").value.trim();
+    const authorInput = document.getElementById("editAuthor").value.trim();
+    const genre = document.getElementById("editGenre").value;
+    const published_date = document.getElementById("editPublishedDate").value;
+
+    // Split the comma-separated author input into an array of objects
+    const authors = authorInput
+        .split(",")
+        .map((name) => ({ name: name.trim() }))
+        .filter((author) => author.name !== "");
+
+    // Build the book update object
+    const updatedBook = {};
+    if (title) updatedBook.title = title;
+    if (pages) updatedBook.pages = parseInt(pages);
+    if (description) updatedBook.description = description;
+    if (authors.length > 0) updatedBook.author = authors;
+    if (genre) updatedBook.genre = genre;
+    if (published_date) updatedBook.published_date = published_date;
 
     try {
         const response = await fetch(`${apiUrl}${bookId}/`, {
-            method: 'PUT',
+            method: "PUT",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({ title, pages, description, author, genre, published_date })
+            body: JSON.stringify(updatedBook),
         });
-        if (response.status === 404) {
-            alert('Book not found');
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert("Error updating book: " + JSON.stringify(errorData));
             return;
         }
-        const updatedBook = await response.json();
-        alert('Book updated: ' + JSON.stringify(updatedBook));
-        getAllBooks();
+
+        const updatedBookData = await response.json();
+        alert("Book updated successfully: " + JSON.stringify(updatedBookData));
+        getAllBooks(); // Refresh the book list
     } catch (error) {
-        console.error('Error updating book:', error);
+        console.error("Error updating book:", error);
     }
 }
+
+
+
+
+
 
 // Delete a book by ID
 async function deleteBook() {

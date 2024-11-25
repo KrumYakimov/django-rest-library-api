@@ -1,55 +1,60 @@
-from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status
-from rest_framework.generics import get_object_or_404
-from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
 from books_api.books.models import Book
 from books_api.books.serializers import BookSerializer
-from books_api.utils.decoradors import generate_schema
-from books_api.utils.helpers import get_object, serializer_valid
+from books_api.utils.helpers import serializer_valid
 
 
-@extend_schema_view(
-    get=generate_schema(BookSerializer, many=True, description="Retrieve a list of all books"),
-    post=generate_schema(BookSerializer, description="Create a new book"),
-)
-class ListBookView(APIView):
-    def get(self, request):
-        books = Book.objects.all()
-        serializer = BookSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class ListBookView(GenericAPIView, ListModelMixin):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
 
-    def post(self, request):
-        serializer = BookSerializer(data=request.data)
+    def get(self, request, *args, **kwargs):
+        """
+        Handles the GET request for listing books.
+        """
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles the POST request for creating a new book.
+        """
+        serializer = self.get_serializer(data=request.data)
         return serializer_valid(serializer)
 
 
-@extend_schema_view(
-    get=generate_schema(BookSerializer, description="Retrieve a specific book by ID"),
-    put=generate_schema(BookSerializer, description="Update an existing book"),
-    delete=extend_schema(
-        responses={204: None},
-        description="Delete a book by ID (No Content)",
-    ),
-)
-class DetailBookView(APIView):
-    def get(self, request, pk):
-        book = get_object(Book, pk)
-        serializer = BookSerializer(book)
+class DetailBookView(GenericAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    def get(self, request, pk, *args, **kwargs):
+        """
+        Handles the GET request for retrieving a specific book.
+        """
+        book = self.get_object()
+        serializer = self.get_serializer(book)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk):
-        book = get_object(Book, pk)
-        serializer = BookSerializer(book, data=request.data)
-        return serializer_valid(serializer)
+    def put(self, request, pk, *args, **kwargs):
+        """
+        Handles the PUT request for updating a book.
+        """
+        book = self.get_object()
+        serializer = self.get_serializer(book, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, pk):
-        book = get_object(Book, pk)
+    def delete(self, request, pk, *args, **kwargs):
+        """
+        Handles the DELETE request for deleting a book.
+        """
+        book = self.get_object()
         book.delete()
-        return Response(status=status.HTTP_200_OK)
-
-
-
-
-
+        return Response(
+            {"detail": "Book deleted successfully"}, status=status.HTTP_204_NO_CONTENT
+        )
