@@ -4,18 +4,38 @@ const apiUrl = 'http://localhost:8000/api/books/';
 async function getAllBooks() {
     try {
         const response = await fetch(apiUrl);
-        const books = await response.json();
+
+        if (!response.ok) {
+            console.error('Error fetching books:', response.statusText);
+            alert('Failed to fetch books. Please try again later.');
+            return;
+        }
+
+        const data = await response.json(); // Parse the response JSON
+        const books = data.results || data; // Handle paginated or non-paginated response
+
         const booksList = document.getElementById('booksList');
-        booksList.innerHTML = '';
+        booksList.innerHTML = ''; // Clear any previous content
+
+        if (!Array.isArray(books)) {
+            console.error('Unexpected response format:', books);
+            alert('Unexpected response format from the API.');
+            return;
+        }
+
         books.forEach(book => {
+            const authorNames = book.author.map(author => author.name).join(", "); // Handle authors correctly
             const listItem = document.createElement('li');
-            listItem.textContent = `ID: ${book.id}, Title: ${book.title}, Author: ${book.author}, Genre: ${book.genre}, Published: ${book.published_date}`;
+            listItem.textContent = `ID: ${book.id}, Title: ${book.title}, Authors: ${authorNames}, Genre: ${book.genre}, Published: ${book.published_date}`;
             booksList.appendChild(listItem);
         });
     } catch (error) {
         console.error('Error fetching books:', error);
+        alert('An unexpected error occurred while fetching books.');
     }
 }
+
+
 
 // Create a new book
 async function createBook(event) {
@@ -93,10 +113,13 @@ async function getBook() {
 
         const book = await response.json();
 
+        // Join all author names into a single string
+        const authorNames = book.author.map(author => author.name).join(", ");
+
         // Render book details in a readable format
         bookDetails.innerHTML = `
             <p><strong>Title:</strong> ${book.title}</p>
-            <p><strong>Author:</strong> ${book.author}</p>
+            <p><strong>Authors:</strong> ${authorNames}</p>
             <p><strong>Pages:</strong> ${book.pages}</p>
             <p><strong>Genre:</strong> ${book.genre}</p>
             <p><strong>Description:</strong> ${book.description}</p>
@@ -107,6 +130,7 @@ async function getBook() {
         console.error('Error fetching book:', error);
     }
 }
+
 
 
 async function editBook(event) {

@@ -20,20 +20,19 @@ class BookSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         authors = validated_data.pop("author")
-
         authors_objects = self._get_or_create_authors(authors)
-
         book = Book.objects.create(**validated_data)
         book.author.add(*authors_objects)
-
         return book
 
     def update(self, instance, validated_data):
         authors = validated_data.pop("author", None)
 
+        # Update instance fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
+        # Update authors if provided
         if authors is not None:
             authors_objects = self._get_or_create_authors(authors)
             instance.author.set(authors_objects)
@@ -48,22 +47,17 @@ class BookSerializer(serializers.ModelSerializer):
         """
         authors_names = [a["name"] for a in authors]
 
+        # Get existing authors
         existing_authors = Author.objects.filter(name__in=authors_names)
         existing_authors_names = set(existing_authors.values_list("name", flat=True))
 
+        # Identify new authors and create them
         new_authors_names = set(authors_names) - existing_authors_names
         new_authors = [Author(name=name) for name in new_authors_names]
-
         created_authors = Author.objects.bulk_create(new_authors)
 
+        # Combine existing and created authors
         return list(existing_authors) + list(created_authors)
-
-    def delete(self, request, pk):
-        book = get_object(Book, pk=pk)
-        book.delete()
-        return Response(
-            {"detail": "Book deleted successfully"}, status=status.HTTP_204_NO_CONTENT
-        )
 
 
 class PublisherSerializer(serializers.ModelSerializer):
