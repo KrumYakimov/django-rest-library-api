@@ -1,5 +1,5 @@
 # Library API
-A simple API for managing a library of books using the Django REST framework.
+A simple API for managing a library of books using the Django REST framework. It was developed as part of a Django REST for the Django Advanced course at Software University.
 
 ## Features
 - Full CRUD (Create, Read, Update, Delete) functionality for books.
